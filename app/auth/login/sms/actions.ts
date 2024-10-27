@@ -10,13 +10,13 @@ const phoneSchema = z
     (phone) => validator.isMobilePhone(phone, "ko-KR"),
     "Wrong phone format",
   );
-const verificationCodeSchema = z.coerce
+const tokenSchema = z.coerce
   .number({ message: "숫자만 입력해주세요." })
   .min(100000, { message: "6자리 숫자를 입력해주세요." })
   .max(999999, { message: "6자리 숫자를 입력해주세요." });
 
 interface ActionState {
-  isSendVerificationCode: boolean;
+  token: boolean;
 }
 
 export async function handleSmsLogin(
@@ -24,20 +24,20 @@ export async function handleSmsLogin(
   formData: FormData,
 ) {
   const phone = formData.get("phone");
-  const verificationCode = formData.get("verificationCode");
+  const token = formData.get("token");
 
-  if (!prevStatus.isSendVerificationCode) {
+  if (!prevStatus.token) {
     const result = phoneSchema.safeParse(phone);
 
     if (!result.success) {
-      return { isSendVerificationCode: false, error: result.error.flatten() };
+      return { token: false, error: result.error.flatten() };
     } else {
-      return { isSendVerificationCode: true };
+      return { token: true };
     }
   } else {
-    const result = verificationCodeSchema.safeParse(verificationCode);
+    const result = tokenSchema.safeParse(token);
     if (!result.success) {
-      return { isSendVerificationCode: true, error: result.error.flatten() };
+      return { token: true, error: result.error.flatten() };
     } else {
       redirect("/");
     }

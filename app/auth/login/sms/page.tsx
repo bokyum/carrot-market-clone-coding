@@ -6,16 +6,12 @@ import { useActionState } from "react";
 import { handleSmsLogin } from "./actions";
 
 const initialState = {
-  isSendVerificationCode: false,
+  token: false,
   error: undefined,
 };
 
 export default function SMSLogin() {
   const [state, dispatch] = useActionState(handleSmsLogin, initialState);
-
-  const handleSubmit = (formData: FormData) => {
-    return dispatch(formData);
-  };
 
   return (
     <div className="flex flex-col gap-10 px-6 py-8">
@@ -25,7 +21,7 @@ export default function SMSLogin() {
       </div>
       <form
         id="sms-login-form"
-        action={handleSubmit}
+        action={dispatch}
         className="flex flex-col gap-3"
       >
         <Input
@@ -34,11 +30,11 @@ export default function SMSLogin() {
           placeholder="Phone number"
           required
           errors={state.error?.formErrors}
-          disabled={state.isSendVerificationCode}
+          disabled={state.token}
         />
-        {state.isSendVerificationCode && (
+        {state.token && (
           <Input
-            name="verificationCode"
+            name="token"
             type="number"
             placeholder="Verification code"
             required
@@ -48,11 +44,7 @@ export default function SMSLogin() {
         )}
         <Btn
           type={"submit"}
-          text={
-            state.isSendVerificationCode
-              ? "Verify Code"
-              : "Send Verification SMS"
-          }
+          text={state.token ? "Verify Code" : "Send Verification SMS"}
         />
       </form>
     </div>
