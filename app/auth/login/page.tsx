@@ -1,14 +1,12 @@
+"use client";
 import FormBtn from "@/components/form-btn";
 import FormInput from "@/components/form-input";
 import SocialLogin from "@/components/social-login";
+import { handleSubmit } from "./actions";
+import { useActionState } from "react";
 
 export default function LogIn() {
-  const handleSubmit = async (data: FormData) => {
-    "use server"; // 함수가 서버에서만 실행되도록 함
-    console.log(data.get("email"), data.get("password"));
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    console.log("i run in the server");
-  };
+  const [state, action] = useActionState(handleSubmit, null);
 
   return (
     <div className="flex flex-col gap-10 px-6 py-8">
@@ -16,7 +14,7 @@ export default function LogIn() {
         <h1 className="text-2xl">안녕하세요!</h1>
         <h2 className="text-xl">Log in with email and password</h2>
       </div>
-      <form action={handleSubmit} className="flex flex-col gap-3">
+      <form action={action} className="flex flex-col gap-3">
         <FormInput
           type="email"
           name="email"
@@ -29,7 +27,7 @@ export default function LogIn() {
           name="password"
           placeholder="Password"
           required={true}
-          errors={[]}
+          errors={state?.errors ?? []}
         />
 
         <FormBtn text="Log In" />
