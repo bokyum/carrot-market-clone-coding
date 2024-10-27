@@ -6,7 +6,7 @@ import { handleSubmit } from "./actions";
 import { useActionState } from "react";
 
 export default function LogIn() {
-  const [state, action] = useActionState(handleSubmit, null);
+  const [state, dispatch] = useActionState(handleSubmit, null);
 
   return (
     <div className="flex flex-col gap-10 px-6 py-8">
@@ -14,24 +14,23 @@ export default function LogIn() {
         <h1 className="text-2xl">안녕하세요!</h1>
         <h2 className="text-xl">Log in with email and password</h2>
       </div>
-      <form action={action} className="flex flex-col gap-3">
+      <form action={dispatch} className="flex flex-col gap-3">
         <FormInput
           type="email"
           name="email"
           placeholder="Email"
           required={true}
-          errors={[]}
         />
         <FormInput
           type="password"
           name="password"
           placeholder="Password"
           required={true}
-          errors={state?.errors ?? []}
         />
 
         <FormBtn text="Log In" />
       </form>
+
       <SocialLogin />
     </div>
   );
