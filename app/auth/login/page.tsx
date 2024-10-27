@@ -6,8 +6,10 @@ export default function LogIn() {
   const handleSubmit = async (data: FormData) => {
     "use server"; // 함수가 서버에서만 실행되도록 함
     console.log(data.get("email"), data.get("password"));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     console.log("i run in the server");
   };
+
   return (
     <div className="flex flex-col gap-10 px-6 py-8">
       <div className="flex flex-col gap-2 *:font-medium">
@@ -30,7 +32,7 @@ export default function LogIn() {
           errors={[]}
         />
 
-        <FormBtn loading={false} text="Log In" />
+        <FormBtn text="Log In" />
       </form>
       <SocialLogin />
     </div>
