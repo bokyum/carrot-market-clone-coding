@@ -9,30 +9,6 @@ import getSession from "../../../libs/session";
 const checkUsername = (username: string) =>
   UserValidation.username.regex.test(username);
 
-const checkUniqueUsername = async (username: string) => {
-  const user = await db.user.findUnique({
-    where: {
-      username,
-    },
-    select: {
-      id: true,
-    },
-  });
-  return !Boolean(user);
-};
-
-const checkUniqueEmail = async (email: string) => {
-  const user = await db.user.findUnique({
-    where: {
-      email,
-    },
-    select: {
-      id: true,
-    },
-  });
-  return !Boolean(user);
-};
-
 const checkPassword = ({
   password,
   confirmPassword,
@@ -58,20 +34,16 @@ const formSchema = z
       .trim()
       .refine(checkUsername, {
         message: UserValidation.username.errors.pattern,
-      })
-      .refine(checkUniqueUsername, {
-        message: UserValidation.username.errors.duplicate,
       }),
+
     email: z
       .string({
         required_error: UserValidation.email.errors.required,
         invalid_type_error: UserValidation.email.errors.type,
       })
       .trim()
-      .email({ message: UserValidation.email.errors.pattern })
-      .refine(checkUniqueEmail, {
-        message: UserValidation.email.errors.duplicate,
-      }),
+      .email({ message: UserValidation.email.errors.pattern }),
+
     password: z
       .string({
         required_error: UserValidation.password.errors.required,
@@ -97,6 +69,44 @@ const formSchema = z
       .regex(UserValidation.confirmPassword.regex, {
         message: UserValidation.password.errors.pattern,
       }),
+  })
+  .superRefine(async ({ username }, ctx) => {
+    const user = await db.user.findUnique({
+      where: {
+        username,
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (user) {
+      ctx.addIssue({
+        code: "custom",
+        message: "This username is already taken.",
+        path: ["username"],
+        fatal: true,
+      });
+    }
+    return z.NEVER;
+  })
+  .superRefine(async ({ email }, ctx) => {
+    const user = await db.user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (user) {
+      ctx.addIssue({
+        code: "custom",
+        message: "This email is already taken.",
+        path: ["email"],
+        fatal: true,
+      });
+    }
+    return z.NEVER;
   })
   .refine(checkPassword, {
     message: UserValidation.confirmPassword.errors.match,
