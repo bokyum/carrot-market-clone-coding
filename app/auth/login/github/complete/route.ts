@@ -1,5 +1,11 @@
 import db from "@/libs/db";
-import getSession from "@/libs/session";
+import {
+  getAccessToken,
+  getGithubUserEmail,
+  getGithubUserProfile,
+} from "@/libs/github";
+
+import { saveSession } from "@/libs/session";
 import { notFound, redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 
@@ -8,38 +14,23 @@ export async function GET(request: NextRequest) {
   if (!code) {
     return notFound();
   }
-  const accessTokenParams = new URLSearchParams({
-    client_id: process.env.GITHUB_CLIENT_ID!,
-    client_secret: process.env.GITHUB_CLIENT_SECRET!,
-    code,
-  }).toString();
-  const accessTokenURL = `https://github.com/login/oauth/access_token?${accessTokenParams}`;
-  const accessTokenResponse = await fetch(accessTokenURL, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-    },
-  });
-
-  const { error, access_token, token_type } = await accessTokenResponse.json();
+  const { error, access_token, token_type } = await getAccessToken(code);
   if (error) {
     return new Response(null, {
       status: 400,
     });
   }
 
-  const userProfileResponse = await fetch("https://api.github.com/user", {
-    headers: {
-      Authorization: `${token_type} ${access_token}`,
-    },
-    cache: "no-cache",
-  });
-
-  const { id, avartar_url, login } = await userProfileResponse.json();
+  const { id, avartar_url, login } = await getGithubUserProfile(
+    access_token,
+    token_type,
+  );
+  // email 정보 찾기
+  const email = await getGithubUserEmail(access_token, token_type);
 
   let user = await db.user.findUnique({
     where: {
-      github_id: id + "",
+      github_id: String(id),
     },
     select: {
       id: true,
@@ -48,18 +39,16 @@ export async function GET(request: NextRequest) {
   if (!user) {
     user = await db.user.create({
       data: {
-        github_id: id + "",
+        github_id: String(id),
         avatar: avartar_url,
         username: login,
+        email,
       },
       select: {
         id: true,
       },
     });
   }
-
-  const session = await getSession();
-  session.id = user.id;
-  await session.save();
+  await saveSession(user.id);
   return redirect("/profile");
 }

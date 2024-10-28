@@ -8,7 +8,8 @@ interface Routes {
 const publicOnlyUrls: Routes = {
   "/": true,
   "/auth/login": true,
-  "/auth/sms": true,
+  "/auth/login/sms": true,
+  "/auth/login/sms/confirm": true,
   "/auth/create-account": true,
   "/auth/login/github": true,
   "/auth/login/github/complete": true,

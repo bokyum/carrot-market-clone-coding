@@ -4,7 +4,7 @@ import db from "@/libs/db";
 import { UserValidation } from "./../../../libs/constants";
 import { z } from "zod";
 import bcrypt from "bcrypt";
-import getSession from "../../../libs/session";
+import { saveSession } from "../../../libs/session";
 
 const checkUsername = (username: string) =>
   UserValidation.username.regex.test(username);
@@ -143,9 +143,8 @@ export async function handleSubmit(prevState: any, formData: FormData) {
 
     // log the user in
 
-    const session = await getSession();
-    session.id = user.id;
-    await session.save();
+    await saveSession(user.id);
+
     // redirect to /
     redirect("/profile");
   }
