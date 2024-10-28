@@ -5,6 +5,7 @@ import SocialLogin from "@/components/social-login";
 
 import { useActionState } from "react";
 import { handleSubmit } from "./actions";
+import { UserValidation } from "@/libs/constants";
 
 export default function CreateAccount() {
   const [state, dispatch] = useActionState(handleSubmit, null);
@@ -21,8 +22,8 @@ export default function CreateAccount() {
           placeholder="Username"
           required={true}
           errors={state?.fieldErrors.username}
-          minLength={3}
-          maxLength={10}
+          minLength={UserValidation.username.minLength}
+          maxLength={UserValidation.username.maxLength}
         />
         <Input
           type="email"
@@ -37,7 +38,7 @@ export default function CreateAccount() {
           placeholder="Password"
           required={true}
           errors={state?.fieldErrors.password}
-          minLength={10}
+          minLength={UserValidation.password.minLength}
         />
         <Input
           type="password"
@@ -45,7 +46,7 @@ export default function CreateAccount() {
           placeholder="Confirm Password"
           required={true}
           errors={state?.fieldErrors.confirmPassword}
-          minLength={10}
+          minLength={UserValidation.confirmPassword.minLength}
         />
 
         <Btn text="Create Account" />

@@ -6,15 +6,16 @@ export const REGEX = {
 
 export const UserValidation = {
   username: {
-    minLength: 3,
+    minLength: 2,
     maxLength: 10,
     regex: REGEX.USERNAME,
     errors: {
       required: "사용자 이름은 필수 입력 사항입니다.",
       type: "사용자 이름은 문자열이어야 합니다.",
-      min: "사용자 이름은 최소 3자 이상이어야 합니다.",
+      min: "사용자 이름은 최소 2자 이상이어야 합니다.",
       max: "사용자 이름은 최대 10자 이하여야 합니다.",
       pattern: "사용자 이름은 영문, 숫자, 밑줄(_)만 사용할 수 있습니다.",
+      duplicate: "사용자 이름이 이미 존재합니다.",
     },
   },
   email: {
@@ -23,6 +24,7 @@ export const UserValidation = {
       required: "이메일은 필수 입력 사항입니다.",
       type: "이메일은 문자열이어야 합니다.",
       pattern: "이메일 형식이 올바르지 않습니다.",
+      duplicate: "이메일이 이미 존재합니다.",
     },
   },
   password: {

@@ -1,9 +1,35 @@
 "use server";
+import db from "@/libs/db";
 import { UserValidation } from "./../../../libs/constants";
 import { z } from "zod";
+import bcrypt from "bcrypt";
 
 const checkUsername = (username: string) =>
   UserValidation.username.regex.test(username);
+
+const checkUniqueUsername = async (username: string) => {
+  const user = await db.user.findUnique({
+    where: {
+      username,
+    },
+    select: {
+      id: true,
+    },
+  });
+  return !Boolean(user);
+};
+
+const checkUniqueEmail = async (email: string) => {
+  const user = await db.user.findUnique({
+    where: {
+      email,
+    },
+    select: {
+      id: true,
+    },
+  });
+  return !Boolean(user);
+};
 
 const checkPassword = ({
   password,
@@ -30,6 +56,9 @@ const formSchema = z
       .trim()
       .refine(checkUsername, {
         message: UserValidation.username.errors.pattern,
+      })
+      .refine(checkUniqueUsername, {
+        message: UserValidation.username.errors.duplicate,
       }),
     email: z
       .string({
@@ -37,7 +66,10 @@ const formSchema = z
         invalid_type_error: UserValidation.email.errors.type,
       })
       .trim()
-      .email({ message: UserValidation.email.errors.pattern }),
+      .email({ message: UserValidation.email.errors.pattern })
+      .refine(checkUniqueEmail, {
+        message: UserValidation.email.errors.duplicate,
+      }),
     password: z
       .string({
         required_error: UserValidation.password.errors.required,
@@ -77,11 +109,27 @@ export async function handleSubmit(prevState: any, formData: FormData) {
     confirmPassword: formData.get("confirmPassword"),
   };
 
-  const result = formSchema.safeParse(data);
+  const result = await formSchema.safeParseAsync(data);
   if (!result.success) {
     console.log(result.error.flatten());
     return result.error.flatten();
   } else {
-    console.log("valid data", result.data);
+    // hash password
+    const hashedPassword = await bcrypt.hash(result.data.password, 12);
+    const user = await db.user.create({
+      data: {
+        username: result.data.username,
+        email: result.data.email,
+        password: hashedPassword,
+      },
+      select: {
+        id: true,
+      },
+    });
+    console.log(user);
+
+    // save user to database
+    // log the user in
+    // redirect to /
   }
 }
