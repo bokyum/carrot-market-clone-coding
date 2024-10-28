@@ -1,10 +1,30 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import getSession from "./libs/session";
 
-// 모든 request에 대해 middleware를 실행
+interface Routes {
+  [key: string]: boolean;
+}
 
+const publicOnlyUrls: Routes = {
+  "/": true,
+  "/auth/login": true,
+  "/auth/sms": true,
+  "/auth/create-account": true,
+  "/auth/login/github": true,
+  "/auth/login/github/complete": true,
+};
 export async function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
-  console.log(pathname);
+  const session = await getSession();
+  const exists = publicOnlyUrls[request.nextUrl.pathname];
+  if (!session.id) {
+    if (!exists) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  } else {
+    if (exists) {
+      return NextResponse.redirect(new URL("/products", request.url));
+    }
+  }
 }
 
 export const config = {
