@@ -1,8 +1,11 @@
 "use server";
+import { redirect } from "next/navigation";
 import db from "@/libs/db";
 import { UserValidation } from "./../../../libs/constants";
 import { z } from "zod";
 import bcrypt from "bcrypt";
+import { cookies } from "next/headers";
+import { getIronSession } from "iron-session";
 
 const checkUsername = (username: string) =>
   UserValidation.username.regex.test(username);
@@ -116,6 +119,7 @@ export async function handleSubmit(prevState: any, formData: FormData) {
   } else {
     // hash password
     const hashedPassword = await bcrypt.hash(result.data.password, 12);
+    // save user to database
     const user = await db.user.create({
       data: {
         username: result.data.username,
@@ -128,8 +132,16 @@ export async function handleSubmit(prevState: any, formData: FormData) {
     });
     console.log(user);
 
-    // save user to database
     // log the user in
+
+    const cookie = await getIronSession(cookies(), {
+      cookieName: process.env.COOKIE_USER_ID,
+      password: process.env.COOKIE_PASSWORD,
+    });
+    // @ts-ignore
+    cookie.id = user.id;
+    await cookie.save();
     // redirect to /
+    redirect("/profile");
   }
 }
