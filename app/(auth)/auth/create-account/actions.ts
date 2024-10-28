@@ -1,10 +1,10 @@
 "use server";
 import { redirect } from "next/navigation";
 import db from "@/libs/db";
-import { UserValidation } from "./../../../libs/constants";
+import { UserValidation } from "../../../../libs/constants";
 import { z } from "zod";
 import bcrypt from "bcrypt";
-import { saveSession } from "../../../libs/session";
+import { saveSession } from "../../../../libs/session";
 
 const checkUsername = (username: string) =>
   UserValidation.username.regex.test(username);
