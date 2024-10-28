@@ -4,8 +4,7 @@ import db from "@/libs/db";
 import { UserValidation } from "./../../../libs/constants";
 import { z } from "zod";
 import bcrypt from "bcrypt";
-import { cookies } from "next/headers";
-import { getIronSession } from "iron-session";
+import getSession from "../../../libs/session";
 
 const checkUsername = (username: string) =>
   UserValidation.username.regex.test(username);
@@ -134,13 +133,9 @@ export async function handleSubmit(prevState: any, formData: FormData) {
 
     // log the user in
 
-    const cookie = await getIronSession(cookies(), {
-      cookieName: process.env.COOKIE_USER_ID,
-      password: process.env.COOKIE_PASSWORD,
-    });
-    // @ts-ignore
-    cookie.id = user.id;
-    await cookie.save();
+    const session = await getSession();
+    session.id = user.id;
+    await session.save();
     // redirect to /
     redirect("/profile");
   }
