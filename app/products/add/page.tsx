@@ -2,14 +2,26 @@
 import Btn from "@/components/btn";
 import Input from "@/components/input";
 import { PhotoIcon } from "@heroicons/react/24/solid";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { uploadProduct } from "./actions";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { productSchema, ProductType } from "./schema";
 
 const limitMB = 10;
 const limitByte = limitMB * 1024 * 1024;
 
 export default function AddProduct() {
   const [preview, setPreview] = useState("");
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<ProductType>({
+    resolver: zodResolver(productSchema),
+  });
+  const [file, setFile] = useState<File | null>(null);
   const onImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { files },
@@ -30,12 +42,28 @@ export default function AddProduct() {
 
     const url = URL.createObjectURL(file);
     setPreview(url);
+    setFile(file);
+    setValue("photo", `./public/photos/${file.name}`);
     console.log(url);
   };
-  const [state, dispatch] = useActionState(uploadProduct, null);
+
+  const onSubmit = handleSubmit(async (data: ProductType) => {
+    const formData = new FormData();
+    formData.append("photo", file as Blob);
+    formData.append("title", data.title);
+    formData.append("price", data.price.toString());
+    formData.append("description", data.description);
+
+    return uploadProduct(formData);
+  });
+
+  const onValid = async () => {
+    await onSubmit();
+  };
+
   return (
     <div>
-      <form action={dispatch} className="flex flex-col gap-5 p-5">
+      <form action={onValid} className="flex flex-col gap-5 p-5">
         <label
           htmlFor="photo"
           className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-neutral-300 bg-cover bg-center text-neutral-300"
@@ -61,22 +89,22 @@ export default function AddProduct() {
           type="text"
           required
           placeholder="제목"
-          name="title"
-          errors={state?.fieldErrors.title}
+          {...register("title")}
+          errors={[errors.title?.message ?? ""]}
         />
         <Input
           type="number"
           required
           placeholder="가격"
-          name="price"
-          errors={state?.fieldErrors.price}
+          {...register("price")}
+          errors={[errors.price?.message ?? ""]}
         />
         <Input
           type="text"
           required
           placeholder="자세한 설명"
-          name="description"
-          errors={state?.fieldErrors.description}
+          {...register("description")}
+          errors={[errors.description?.message ?? ""]}
         />
         <Btn text="작성완료" />
       </form>
