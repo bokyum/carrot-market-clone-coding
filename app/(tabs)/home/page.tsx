@@ -13,7 +13,7 @@ async function getInitalProducts() {
       created_at: true,
       photo: true,
     },
-    take: 1,
+    take: 10,
     orderBy: {
       created_at: "desc",
     },
