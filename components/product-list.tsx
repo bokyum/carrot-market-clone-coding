@@ -1,8 +1,8 @@
 "use client";
-import { InitialProducts } from "@/app/(tabs)/products/page";
+import { InitialProducts } from "@/app/(tabs)/home/page";
 import ListProduct from "./list-product";
 import { useEffect, useRef, useState } from "react";
-import { getMoreProduct } from "@/app/(tabs)/products/actions";
+import { getMoreProduct } from "@/app/(tabs)/home/actions";
 
 interface ProductListProps {
   initialProducts: InitialProducts;
@@ -19,7 +19,7 @@ export default function ProductList({ initialProducts }: ProductListProps) {
     const observer = new IntersectionObserver(
       async (
         entries: IntersectionObserverEntry[],
-        observer: IntersectionObserver,
+        observer: IntersectionObserver
       ) => {
         const element = entries[0];
         if (element.isIntersecting && trigger.current) {
@@ -27,8 +27,8 @@ export default function ProductList({ initialProducts }: ProductListProps) {
           setIsLoading(true);
           const newProducts = await getMoreProduct(page + 1);
           if (newProducts.length !== 0) {
-            setPage((prev) => prev + 1);
-            setProducts((prev) => [...prev, ...newProducts]);
+            setPage(prev => prev + 1);
+            setProducts(prev => [...prev, ...newProducts]);
           } else {
             setIsLastPage(true);
           }
@@ -37,7 +37,7 @@ export default function ProductList({ initialProducts }: ProductListProps) {
       },
       {
         threshold: 1.0,
-      },
+      }
     );
     if (trigger.current) {
       observer.observe(trigger.current);
@@ -49,7 +49,7 @@ export default function ProductList({ initialProducts }: ProductListProps) {
 
   return (
     <div className="flex flex-col gap-5 p-5">
-      {products.map((product) => (
+      {products.map(product => (
         <ListProduct key={product.id} {...product} />
       ))}
 

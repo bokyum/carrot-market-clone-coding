@@ -12,11 +12,6 @@ const prisma = new PrismaClient();
         photo: faker.image.urlPicsumPhotos(),
         created_at: new Date(),
         user_id: 11,
-        // user: {
-        //   connect: {
-        //     id: 11,
-        //   },
-        // },
       },
     });
   }
