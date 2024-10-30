@@ -11,14 +11,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  potato,
 }: Readonly<{
   children: React.ReactNode;
+  potato: React.ReactNode;
 }>) {
+  console.log("potato", potato);
   return (
     <html lang="en">
       <body
         className={`mx-auto max-w-screen-sm bg-neutral-900 text-white antialiased`}
       >
+        {potato}
         {children}
       </body>
     </html>

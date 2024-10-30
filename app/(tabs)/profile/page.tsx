@@ -1,3 +1,4 @@
+import Btn from "@/components/btn";
 import db from "@/libs/db";
 import getSession, { clearSession } from "@/libs/session";
 import { notFound, redirect } from "next/navigation";
@@ -12,10 +13,11 @@ async function getUser() {
     });
     if (user) return user;
   }
-  notFound();
+  return notFound();
 }
 export default async function Profile() {
   const user = await getUser();
+
   const logOut = async () => {
     "use server";
     await clearSession();
@@ -25,7 +27,7 @@ export default async function Profile() {
     <div>
       <h1>Welcome! {user?.username}!</h1>
       <form action={logOut}>
-        <button>Log out</button>
+        <Btn text="Log Out" />
       </form>
     </div>
   );
