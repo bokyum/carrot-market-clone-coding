@@ -24,7 +24,7 @@ export default function LikeBtn({
   );
   const onClick = async () => {
     startTransition(() => {
-      reducerFn("like");
+      reducerFn(undefined);
       if (isLiked) {
         dislikePost(postId);
       } else {
