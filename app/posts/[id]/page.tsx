@@ -1,14 +1,11 @@
 import db from "@/libs/db";
 import getSession from "@/libs/session";
 import { formatToTimeAgo } from "@/libs/utils";
-import {
-  EyeIcon,
-  HandThumbUpIcon,
-  UserCircleIcon,
-} from "@heroicons/react/24/solid";
-import { revalidateTag, unstable_cache } from "next/cache";
+import { EyeIcon, UserCircleIcon } from "@heroicons/react/24/solid";
+import { unstable_cache } from "next/cache";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import LikeBtn from "@/components/like-btn";
 
 async function getPost(id: number) {
   try {
@@ -72,6 +69,7 @@ async function getCachedLikeStatus(postId: number) {
   }
   const cachedOperation = unstable_cache(getLikeStatus, [`post-like-status`], {
     tags: [`post-like-status-${postId}`],
+    revalidate: 60,
   });
   return cachedOperation(postId, userId);
 }
@@ -89,34 +87,7 @@ export default async function PostDetail({
   if (!post) {
     return notFound();
   }
-  const likePost = async () => {
-    "use server";
-    const session = await getSession();
-    try {
-      await db.like.create({
-        data: {
-          post_id: id,
-          user_id: session.id!,
-        },
-      });
-      revalidateTag(`post-like-status-${id}`);
-    } catch (e) {}
-  };
-  const dislikePost = async () => {
-    "use server";
-    try {
-      const session = await getSession();
-      await db.like.delete({
-        where: {
-          id: {
-            post_id: id,
-            user_id: session.id!,
-          },
-        },
-      });
-      revalidateTag(`post-like-status-${id}`);
-    } catch (e) {}
-  };
+
   const { likeCount, isLiked } = await getCachedLikeStatus(id);
   return (
     <div className="p-5 text-white">
@@ -147,15 +118,7 @@ export default async function PostDetail({
           <EyeIcon className="size-5" />
           <span>조회 {post.views}</span>
         </div>
-        <form action={isLiked ? dislikePost : likePost}>
-          <button
-            className={`flex ${isLiked ? "border-orange-500 bg-orange-500 text-white" : "hover:bg-neutral-800"} items-center gap-2 rounded-full border border-neutral-400 p-2 text-sm text-neutral-400 transition-colors`}
-          >
-            <HandThumbUpIcon className="size-5" />
-
-            {isLiked ? <span>({likeCount})</span> : <span>({likeCount})</span>}
-          </button>
-        </form>
+        <LikeBtn isLiked={isLiked} likeCount={likeCount} postId={id} />
       </div>
     </div>
   );
