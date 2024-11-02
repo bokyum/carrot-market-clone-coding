@@ -1,4 +1,9 @@
-export default function Extras() {
+interface ExtrasProps {
+  params: { slug: string[] };
+}
+
+export default function Extras({ params }: ExtrasProps) {
+  const { slug } = params;
   return (
     <div className="flex flex-col gap-3 py-10">
       <h1 className="font-roboto text-6xl">Extras!!</h1>
@@ -8,6 +13,9 @@ export default function Extras() {
         font that is easy to read and write.
         <br />
         <br />
+      </p>
+      <p className="font-d2coding">
+        <code>{slug.join(", ")}</code>
       </p>
     </div>
   );
