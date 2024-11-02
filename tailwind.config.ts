@@ -6,7 +6,13 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  theme: {},
+  theme: {
+    fontFamily: {
+      roboto: "var(--roboto-text)",
+      rubik: "var(--rubik-text)",
+      d2coding: "var(--d2coding-text)",
+    },
+  },
   plugins: [],
 };
 export default config;

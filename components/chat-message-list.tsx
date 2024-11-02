@@ -26,7 +26,20 @@ export default function ChatMessageList({
   };
   const onSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    alert(message);
+    setMessages(prev => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        user_id: userId,
+        payload: message,
+        created_at: new Date(),
+        user: {
+          id: userId,
+          username: "username",
+          avatar: "",
+        },
+      },
+    ]);
     setMessage("");
   };
 
