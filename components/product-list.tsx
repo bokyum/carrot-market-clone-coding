@@ -16,6 +16,8 @@ export default function ProductList({ initialProducts }: ProductListProps) {
   const trigger = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
+    // 현재 페이지가 /home일때만 실행
+
     const observer = new IntersectionObserver(
       async (
         entries: IntersectionObserverEntry[],
