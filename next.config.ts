@@ -1,10 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    taint: true,
+  },
   logging: {
     fetches: {
       fullUrl: true,
-      hmrRefreshes: true,
     },
   },
   /* config options here */
