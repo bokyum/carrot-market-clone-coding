@@ -3,8 +3,8 @@ import getSession from "@/libs/session";
 import { formatToWon } from "@/libs/utils";
 import { UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { createChateRoom } from "./actions";
 
 async function getIsOwner(userId: number) {
   const session = await getSession();
@@ -56,6 +56,11 @@ export default async function ProductDetail({
 
   const isOwner = await getIsOwner(product.user_id);
 
+  const handleCreateRoomBtn = async () => {
+    "use server";
+    await createChateRoom(product.user_id);
+  };
+
   return (
     <div>
       <div className="relative aspect-square">
@@ -96,12 +101,11 @@ export default async function ProductDetail({
             Delete product
           </button>
         ) : (
-          <Link
-            className="rounded-md bg-orange-500 px-5 py-2.5 font-semibold text-white"
-            href={``}
-          >
-            채팅하기
-          </Link>
+          <form action={handleCreateRoomBtn}>
+            <button className="rounded-md bg-orange-500 px-5 py-2.5 font-semibold text-white">
+              채팅하기
+            </button>
+          </form>
         )}
       </div>
     </div>
