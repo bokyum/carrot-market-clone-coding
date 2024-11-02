@@ -40,9 +40,9 @@ export default async function Modal({ params }: { params: { id: string } }) {
 
   const isOwner = await getIsOwner(product.user_id);
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <BackBtn className="absolute right-5 top-5 text-neutral-200">
-        <XMarkIcon className="h-10 w-10" /> {/* 클래스명 수정 */}
+    <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-40">
+      <BackBtn className="absolute right-5 top-5 z-10 rounded-full bg-black text-neutral-200">
+        <XMarkIcon className="size-8" />
       </BackBtn>
       <div className="flex h-full w-full max-w-[500px] flex-col justify-between rounded-md bg-neutral-900">
         <div className="flex-grow overflow-y-auto">
